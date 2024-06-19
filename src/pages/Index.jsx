@@ -1,4 +1,4 @@
-import { Container, VStack, Heading, Text, Box, Button, HStack, IconButton, Input, FormControl, FormLabel } from "@chakra-ui/react";
+import { Container, VStack, Heading, Text, Box, Button, HStack, IconButton, Input, FormControl, FormLabel, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter } from "@chakra-ui/react";
 import { useState } from "react";
 import { FaBriefcase, FaMapMarkerAlt, FaDollarSign } from "react-icons/fa";
 
@@ -29,6 +29,8 @@ const jobListings = [
 const Index = () => {
   const [jobs, setJobs] = useState(jobListings);
   const [form, setForm] = useState({ title: "", company: "", location: "", salary: "" });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [applicationForm, setApplicationForm] = useState({ name: "", email: "", resume: "" });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,6 +43,23 @@ const Index = () => {
     setJobs((prevJobs) => [...prevJobs, newJob]);
     setForm({ title: "", company: "", location: "", salary: "" });
   };
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  const handleApplicationChange = (e) => {
+    const { name, value } = e.target;
+    setApplicationForm((prevForm) => ({ ...prevForm, [name]: value }));
+  };
+
+  const handleApplicationSubmit = (e) => {
+    e.preventDefault();
+    // Logic to handle form submission, e.g., sending data to a server
+    console.log("Application submitted:", applicationForm);
+    setApplicationForm({ name: "", email: "", resume: "" });
+    closeModal();
+  };
+
   return (
     <Container centerContent maxW="container.md" py={10}>
       <VStack spacing={8} align="stretch">
@@ -82,12 +101,37 @@ const Index = () => {
               <FaDollarSign /> {job.salary}
             </Text>
             <HStack mt={4} spacing={4}>
-              <Button colorScheme="teal">Apply Now</Button>
+              <Button colorScheme="teal" onClick={openModal}>Apply Now</Button>
               <IconButton aria-label="Save Job" icon={<FaBriefcase />} />
             </HStack>
           </Box>
         ))}
       </VStack>
+
+      <Modal isOpen={isModalOpen} onClose={closeModal}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Apply for Job</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl id="name" isRequired>
+              <FormLabel>Name</FormLabel>
+              <Input name="name" value={applicationForm.name} onChange={handleApplicationChange} />
+            </FormControl>
+            <FormControl id="email" isRequired mt={4}>
+              <FormLabel>Email</FormLabel>
+              <Input name="email" value={applicationForm.email} onChange={handleApplicationChange} />
+            </FormControl>
+            <FormControl id="resume" isRequired mt={4}>
+              <FormLabel>Resume</FormLabel>
+              <Input name="resume" value={applicationForm.resume} onChange={handleApplicationChange} />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="teal" onClick={handleApplicationSubmit}>Submit Application</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Container>
   );
 };
